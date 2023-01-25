@@ -2,10 +2,11 @@
 #define DB_UTILS_H
 
 #include <postgresql/libpq-fe.h>
+#include "types.h"
 #include "bottle.h"
 #include "module.h"
-#include "order.h"
 #include "cocktail.h"
+// #include "order.h"
 
 /**
  * @brief Connect to a database
@@ -31,28 +32,17 @@ void db_disconnect(PGconn *conn);
 void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, int));
 
 /**
- * @brief Get all the bottles from the database
+ * @brief Check if the insertion was successful
  * @param conn A pointer to a PGconn object
- * @return A pointer to a Bottle array
+ * @param result A pointer to a PGresult object
  */
-bottle_t **get_bottles(PGconn *conn, int *length);
+void check_insertion(PGconn *conn, PGresult *result);
 
 /**
- * @brief Create a bottle based on the row of a PGresult object
- * @param result A pointer to a PGresult object
- * @param row The row to get the data from
- * @param nbFields The number of fields in the row
- * @return A pointer to a bottle_t object
+ * @brief Check if the ip address is valid
+ * @param ip_address The ip address to check
+ * @return A pointer to NULL if the ip address isn't valid
  */
-bottle_t *create_bottle(PGresult *result, int row, int nbFields);
-
-/**
- * @brief Create a module base on the row of a PGresult object
- * @param result A pointer to a PGresult object
- * @param row The row to get the data from
- * @param nbFields The number of fields in the row
- * @return A pointer to a module_t object
- */
-module_t *create_module(PGresult *result, int row, int nbFields);
+int *check_ip_address(char *ip_address);
 
 #endif

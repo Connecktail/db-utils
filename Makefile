@@ -6,20 +6,24 @@ BUILD=build
 SRC=src
 INCLUDE=include
 
+STATIC=$(BUILD)/libdb-utils.a
+SHARED=$(BUILD)/libdb-utils.so
 
-all: static shared
+OBJECTS_FILES=$(OBJECTS)/utils.o $(OBJECTS)/bottle.o $(OBJECTS)/cocktail.o $(OBJECTS)/module.o
 
-static: objects_files
-	ar rcs $(BUILD)/libdb-utils.a $(OBJECTS)/*.o
+all: $(STATIC) $(SHARED)
 
-shared: objects_files
-	$(CC) -shared -o $(BUILD)/libdb-utils.so $(OBJECTS)/*.o
+$(STATIC): $(OBJECTS_FILES)
+	ar rcs $@ $(OBJECTS_FILES)
 
-objects_files: $(SRC)/utils.c $(INCLUDE)/*.h
-	$(CC) $(FLAGS) -c -fPIC $(SRC)/utils.c -o $(OBJECTS)/db-utils.o
+$(SHARED): $(OBJECTS_FILES)
+	$(CC) -shared $(OBJECTS_FILES) -lpq -o $@
 
-install: static shared
-	sudo cp $(BUILD)/libdb-utils.so /usr/lib
+$(OBJECTS)/%.o: $(SRC)/%.c $(INCLUDE)/*.h
+	$(CC) $(FLAGS) -c -fPIC -o $@ $<
+
+install: $(STATIC) $(SHARED)
+	sudo cp $(SHARED) /usr/lib
 	sudo mkdir -p /usr/include/db-utils
 	sudo cp $(INCLUDE)/*.h /usr/include/db-utils
 
@@ -28,6 +32,8 @@ uninstall:
 	sudo rm -f /usr/lib/libdb-utils.so
 
 clean: uninstall
-	rm -f $(OBJECTS)*.o
-	rm -f $(BUILD)*.a
-	rm -f $(BUILD)*.so
+	rm -f $(OBJECTS)/*
+	rm -f $(BUILD)/*
+
+test: test.c $(SHARED)
+	$(CC) $(FLAGS) -o test test.c -L$(BUILD) -ldb-utils -lpq -o test

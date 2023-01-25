@@ -43,43 +43,32 @@ void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, in
     return table;
 }
 
-bottle_t *create_bottle(PGresult *result, int row, int nbFields)
+void check_insertion(PGconn *conn, PGresult *result)
 {
-    bottle_t *bottle = (bottle_t *)malloc(sizeof(bottle_t));
-    for (int i = 0; i < nbFields; i++)
+    if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
-        if (strcmp(PQfname(result, i), "id") == 0)
-            bottle->id = atoi(PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "quantity") == 0)
-            bottle->quantity = atoi(PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "url") == 0)
-            strcpy(bottle->url, PQgetvalue(result, row, i));
+        fprintf(stderr, "Insertion failed: %s", PQerrorMessage(conn));
+        return;
     }
-    bottle->module = create_module(result, row, nbFields);
-    return bottle;
 }
 
-module_t *create_module(PGresult *result, int row, int nbFields)
+int *check_ip_address(char *ip_address)
 {
-    module_t *module = (module_t *)malloc(sizeof(module_t));
-    for (int i = 0; i < nbFields; i++)
+    int *ip = malloc(4 * sizeof(int));
+    char *ip_address_copy = malloc(strlen(ip_address) + 1);
+    strcpy(ip_address_copy, ip_address);
+    char *token = strtok(ip_address_copy, ".");
+    int i = 0;
+    while (token != NULL)
     {
-        if (strcmp(PQfname(result, i), "id") == 0)
-            module->id = atoi(PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "ip_address") == 0)
-            strcpy(module->ip_address, PQgetvalue(result, row, i));
+        ip[i] = atoi(token);
+        printf("%d\n", ip[i]);
+        if (ip[i] < 0 || ip[i] > 255)
+            return NULL;
+        token = strtok(NULL, ".");
+        i++;
     }
-    return module;
-}
-
-bottle_t **get_bottles(PGconn *conn, int *length)
-{
-    PGresult *result = PQexec(conn, "SELECT * FROM bottles, modules WHERE bottles.id_module = modules.id");
-
-    bottle_t **bottles = (bottle_t **)_loop_through_data(result, &create_bottle);
-    *length = PQntuples(result);
-    if (bottles == NULL)
+    if (i != 4)
         return NULL;
-    PQclear(result);
-    return bottles;
+    return ip;
 }

@@ -1,6 +1,6 @@
 # db-utils
 
-##Goal :
+##Purpose :
 
 That library was written in order to make the communication with the postgre database easier. You have at your disposal several functions to for example : connect to the db, get the list of bottles...
 
@@ -44,26 +44,38 @@ Some structs have been defined in order to corresponding to a row in each table 
 ```c
 typedef struct
 {
-    int id;
-    char ip_address[255];
+    id_db_t id;
+    ip_address_t ip_address;
 } module_t;
 
 ```
 
 **Bottle**
-The struct is defined as below :
 
 ```c
 typedef struct
 {
-    int id;
-    char url[255];
+    id_db_t id;
+    url_t url;
     float quantity;
     module_t *module;
 } bottle_t;
 ```
 
+**Cocktail**
+
+```c
+typedef struct
+{
+    id_db_t id;
+    float price;
+    url_t image;
+} cocktail_t;
+```
+
 ##Functions :
+
+###Utils
 Connect to the database :
 
 ```c
@@ -76,7 +88,14 @@ Disconnect from the database :
 void db_disconnect(PGconn *conn)
 ```
 
-Get the lists of bottles :
+Know if a provided ipv4 address is valid :
+
+```c
+int *check_ip_address(char *ip_address)
+```
+
+###Bottles
+Get the list of bottles :
 
 ```c
 bottle_t **get_bottles(PGconn *conn, int *length)
@@ -88,14 +107,50 @@ Create a bottle :
 bottle_t *create_bottle(PGresult *result, int row, int nbFields)
 ```
 
+###Modules
+Get the list of modules :
+
+```c
+module_t **get_modules(PGconn *conn, int *length)
+```
+
 Create a module :
 
 ```c
 module_t *create_module(PGresult *result, int row, int nbFields)
 ```
 
+Insert a module in the database :
+
+```c
+void insert_module(PGconn *conn, module_t *module)
+```
+
+###Cocktails
+Get the list of cocktails :
+
+```c
+cocktail_t **get_cocktails(PGconn *conn, int *length)
+```
+
+Create a cocktail :
+
+```c
+cocktail_t *create_cocktail(PGresult *result, int row, int nbFields)
+```
+
+###Functions not to use (used to develop)
+
 Loop though a query result :
 
 ```c
 void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, int))
 ```
+
+Print an object :
+
+```c
+void _print_{object_name}(object_type *object)
+```
+
+example : `void _print_cocktail(cocktail_t *cocktail)`
