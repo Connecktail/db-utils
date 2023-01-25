@@ -35,4 +35,12 @@ bottle_t *create_bottle(PGresult *result, int row, int nbFields);
  */
 void _print_bottle(bottle_t *bottle);
 
+/**
+ * @brief Insert a bottle in the database
+ * @param conn A pointer to a PGconn object
+ * @param module A pointer to a bottel_t object
+ * @remark The bottle must have a module whereas insertion won't work
+ */
+void insert_bottle(PGconn *conn, bottle_t *bottle);
+
 #endif

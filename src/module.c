@@ -31,7 +31,8 @@ module_t **get_modules(PGconn *conn, int *length)
 
 void _print_module(module_t *module)
 {
-    printf("Module[%d] {", *(module->id));
+    int id = module->id == NULL ? -1 : *(module->id);
+    printf("Module[%d] {", id);
     printf("ip_address: %s", module->ip_address);
     printf("}\n");
 }
@@ -46,11 +47,11 @@ void insert_module(PGconn *conn, module_t *module)
         return;
     }
 
-    printf("IP address: %s\n", module->ip_address);
-
     char query[1024];
-    sprintf(query, "INSERT INTO modules (ip_address) VALUES ('%s')", module->ip_address);
+    sprintf(query, "INSERT INTO modules (ip_address) VALUES ('%s') RETURNING id", module->ip_address);
     PGresult *result = PQexec(conn, query);
     check_insertion(conn, result);
+    module->id = (int *)malloc(sizeof(int));
+    *(module->id) = atoi(PQgetvalue(result, 0, 0));
     PQclear(result);
 }

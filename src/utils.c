@@ -45,7 +45,7 @@ void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, in
 
 void check_insertion(PGconn *conn, PGresult *result)
 {
-    if (PQresultStatus(result) != PGRES_COMMAND_OK)
+    if (PQresultStatus(result) != PGRES_COMMAND_OK && PQresultStatus(result) != PGRES_TUPLES_OK)
     {
         fprintf(stderr, "Insertion failed: %s", PQerrorMessage(conn));
         return;
@@ -62,7 +62,6 @@ int *check_ip_address(char *ip_address)
     while (token != NULL)
     {
         ip[i] = atoi(token);
-        printf("%d\n", ip[i]);
         if (ip[i] < 0 || ip[i] > 255)
             return NULL;
         token = strtok(NULL, ".");

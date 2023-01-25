@@ -33,8 +33,21 @@ bottle_t **get_bottles(PGconn *conn, int *length)
 
 void _print_bottle(bottle_t *bottle)
 {
-    printf("Bottle[%d] {", *(bottle->id));
+    int id = bottle->id == NULL ? -1 : *(bottle->id);
+    printf("Bottle[%d] {", id);
+    printf("url: %s, ", bottle->url);
     printf("quantity: %f, ", bottle->quantity);
     printf("module: %d", *(bottle->module->id));
     printf("}\n");
+}
+
+void insert_bottle(PGconn *conn, bottle_t *bottle)
+{
+    char query[1024];
+    sprintf(query, "INSERT INTO bottles (quantity, url, id_module) VALUES (%f, '%s', %d) RETURNING id", bottle->quantity, bottle->url, *(bottle->module->id));
+    PGresult *result = PQexec(conn, query);
+    check_insertion(conn, result);
+    bottle->id = (int *)malloc(sizeof(int));
+    *(bottle->id) = atoi(PQgetvalue(result, 0, 0));
+    PQclear(result);
 }
