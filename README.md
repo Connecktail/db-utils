@@ -107,6 +107,12 @@ Create a bottle :
 bottle_t *create_bottle(PGresult *result, int row, int nbFields)
 ```
 
+Insert bottle in the database :
+
+```c
+void insert_bottle(PGconn *conn, bottle_t *bottle)
+```
+
 ###Modules
 Get the list of modules :
 
