@@ -40,7 +40,6 @@ void _print_module(module_t *module)
 void insert_module(PGconn *conn, module_t *module)
 {
     int *check = check_ip_address(module->ip_address);
-
     if (check == NULL)
     {
         fprintf(stderr, "Invalid IP address\n");
@@ -49,9 +48,8 @@ void insert_module(PGconn *conn, module_t *module)
 
     char query[1024];
     sprintf(query, "INSERT INTO modules (ip_address) VALUES ('%s') RETURNING id", module->ip_address);
-    PGresult *result = PQexec(conn, query);
-    check_insertion(conn, result);
-    module->id = (int *)malloc(sizeof(int));
-    *(module->id) = atoi(PQgetvalue(result, 0, 0));
-    PQclear(result);
+    id_db_t id = _insert_data(conn, query);
+    if (id == NULL)
+        return;
+    module->id = id;
 }

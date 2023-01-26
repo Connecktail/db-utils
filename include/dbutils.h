@@ -35,8 +35,9 @@ void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, in
  * @brief Check if the insertion was successful
  * @param conn A pointer to a PGconn object
  * @param result A pointer to a PGresult object
+ * @return A pointer to NULL if the insertion failed
  */
-void check_insertion(PGconn *conn, PGresult *result);
+void *check_insertion(PGconn *conn, PGresult *result);
 
 /**
  * @brief Check if the ip address is valid
@@ -44,5 +45,28 @@ void check_insertion(PGconn *conn, PGresult *result);
  * @return A pointer to NULL if the ip address isn't valid
  */
 int *check_ip_address(char *ip_address);
+
+/**
+ * @brief Check if the arg is positive
+ * @param arg The arg to check
+ * @param type The type of the argument
+ * @return A pointer to NULL if the arg isn't valid
+ */
+int *check_positive(void *arg, types type);
+
+/**
+ * @brief Check if the url is valid
+ * @param url The url to check
+ * @return A pointer to NULL if the url isn't valid
+ */
+int *check_url(char *url);
+
+/**
+ * @brief Insert an object into the database, check the insertion and return id
+ * @param conn A pointer to a PGconn object
+ * @param query The query to execute
+ * @return A pointer to NULL if the insertion failed otherwise a pointer to the id
+ */
+int *_insert_data(PGconn *conn, char *query);
 
 #endif

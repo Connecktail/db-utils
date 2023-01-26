@@ -43,11 +43,27 @@ void _print_bottle(bottle_t *bottle)
 
 void insert_bottle(PGconn *conn, bottle_t *bottle)
 {
+    int *check = check_positive((void *)&(bottle->quantity), FLOAT);
+    if (check == NULL)
+    {
+        fprintf(stderr, "Bottle quantity must be positive\n");
+        return;
+    }
+    check = check_url(bottle->url);
+    if (check == NULL)
+    {
+        fprintf(stderr, "Invalid URL\n");
+        return;
+    }
+
     char query[1024];
     sprintf(query, "INSERT INTO bottles (quantity, url, id_module) VALUES (%f, '%s', %d) RETURNING id", bottle->quantity, bottle->url, *(bottle->module->id));
-    PGresult *result = PQexec(conn, query);
-    check_insertion(conn, result);
-    bottle->id = (int *)malloc(sizeof(int));
-    *(bottle->id) = atoi(PQgetvalue(result, 0, 0));
-    PQclear(result);
+
+    id_db_t id = _insert_data(conn, query);
+    if (id == NULL)
+    {
+        fprintf(stderr, "Error while inserting bottle\n");
+        return;
+    }
+    bottle->id = id;
 }

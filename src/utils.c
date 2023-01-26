@@ -43,13 +43,14 @@ void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, in
     return table;
 }
 
-void check_insertion(PGconn *conn, PGresult *result)
+void *check_insertion(PGconn *conn, PGresult *result)
 {
     if (PQresultStatus(result) != PGRES_COMMAND_OK && PQresultStatus(result) != PGRES_TUPLES_OK)
     {
         fprintf(stderr, "Insertion failed: %s", PQerrorMessage(conn));
-        return;
+        return NULL;
     }
+    return (void *)1;
 }
 
 int *check_ip_address(char *ip_address)
@@ -70,4 +71,48 @@ int *check_ip_address(char *ip_address)
     if (i != 4)
         return NULL;
     return ip;
+}
+
+int *check_positive(void *arg, types type)
+{
+    if (type == INT)
+    {
+        int *value = (int *)arg;
+        if (*value < 0)
+            return NULL;
+    }
+    else if (type == FLOAT)
+    {
+        float *value = (float *)arg;
+        if (*value < 0)
+            return NULL;
+    }
+    else if (type == DOUBLE)
+    {
+        double *value = (double *)arg;
+        if (*value < 0)
+            return NULL;
+    }
+    return (int *)arg;
+}
+
+int *check_url(char *url)
+{
+    if (strncmp(url, "http://", 7) != 0 && strncmp(url, "https://", 8) != 0)
+        return NULL;
+    if (strchr(url, ' ') != NULL)
+        return NULL;
+    return (int *)url;
+}
+
+int *_insert_data(PGconn *conn, char *query)
+{
+    PGresult *result = PQexec(conn, query);
+    void *check = check_insertion(conn, result);
+    if (check == NULL)
+        return NULL;
+    id_db_t id = malloc(sizeof(id_db_t));
+    *id = atoi(PQgetvalue(result, 0, 0));
+    PQclear(result);
+    return id;
 }
