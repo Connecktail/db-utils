@@ -17,7 +17,7 @@ $(STATIC): $(OBJECTS_FILES)
 	ar rcs $@ $(OBJECTS_FILES)
 
 $(SHARED): $(OBJECTS_FILES)
-	$(CC) -shared $(OBJECTS_FILES) -lpq -o $@
+	$(CC) -shared $(FLAGS) $(OBJECTS_FILES) -lpq -o $@
 
 $(OBJECTS)/%.o: $(SRC)/%.c $(INCLUDE)/*.h
 	$(CC) $(FLAGS) -c -fPIC -o $@ $<

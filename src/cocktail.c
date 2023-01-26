@@ -33,8 +33,32 @@ cocktail_t **get_cocktails(PGconn *conn, int *length)
 
 void _print_cocktail(cocktail_t *cocktail)
 {
-    printf("Cocktail[%d] {", *(cocktail->id));
+    int id = cocktail->id == NULL ? -1 : *(cocktail->id);
+    printf("Cocktail[%d] {", id);
     printf("price: %f, ", cocktail->price);
     printf("image: %s", cocktail->image);
     printf("}\n");
+}
+
+void insert_cocktail(PGconn *conn, cocktail_t *cocktail)
+{
+    int *check = check_positive((void *)&(cocktail->price), FLOAT);
+    if (check == NULL)
+    {
+        fprintf(stderr, "Invalid price\n");
+        return;
+    }
+    check = check_url(cocktail->image);
+    if (check == NULL)
+    {
+        fprintf(stderr, "Invalid URL\n");
+        return;
+    }
+
+    char query[1024];
+    sprintf(query, "INSERT INTO cocktails (price, image) VALUES (%f, '%s') RETURNING id", cocktail->price, cocktail->image);
+    id_db_t id = _insert_data(conn, query);
+    if (id == NULL)
+        return;
+    cocktail->id = id;
 }

@@ -33,4 +33,11 @@ cocktail_t **get_cocktails(PGconn *conn, int *length);
  */
 void _print_cocktail(cocktail_t *cocktail);
 
+/**
+ * @brief Insert a cocktail in the database
+ * @param conn A pointer to a PGconn object
+ * @param cocktail A pointer to a cocktail_t object
+ */
+void insert_cocktail(PGconn *conn, cocktail_t *cocktail);
+
 #endif

@@ -36,7 +36,7 @@ On the other hand, if you want to use the dynamic library, specify the name of t
 gcc file.c -ldb-utils -o file
 ```
 
-##Data structures :
+## Data structures :
 
 Some structs have been defined in order to corresponding to a row in each table in the database. It means, it provides a bottle_t type, module_t, ...
 **Module :**
@@ -172,7 +172,13 @@ cocktail_t **get_cocktails(PGconn *conn, int *length)
 cocktail_t *create_cocktail(PGresult *result, int row, int nbFields)
 ```
 
-###Functions not to use (used to develop)
+- Insert a cocktail in the database :
+
+```c
+void insert_cocktail(PGconn *conn, cocktail_t *cocktail)
+```
+
+### Functions not to use (used to develop)
 
 - Loop though a query result :
 
@@ -188,7 +194,7 @@ void _print_{object_name}(object_type *object)
 
 example : `void _print_cocktail(cocktail_t *cocktail)`
 
-I- nsert an object in the database :
+- Insert an object in the database :
 
 ```c
 int *_insert_data(PGconn *conn, char *query)
