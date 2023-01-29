@@ -46,10 +46,51 @@ void insert_module(PGconn *conn, module_t *module)
         return;
     }
 
-    char query[1024];
+    char query[QUERY_LENGTH];
     sprintf(query, "INSERT INTO modules (ip_address) VALUES ('%s') RETURNING id", module->ip_address);
     id_db_t id = _insert_data(conn, query);
     if (id == NULL)
         return;
     module->id = id;
+}
+
+void delete_module(PGconn *conn, id_db_t id)
+{
+    if (id == NULL)
+    {
+        fprintf(stderr, "Invalid id\n");
+        return;
+    }
+    char query[QUERY_LENGTH];
+    sprintf(query, "DELETE FROM modules WHERE id = %d", *id);
+    _delete_data(conn, query);
+}
+
+void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
+{
+    if (module->id == NULL)
+    {
+        fprintf(stderr, "Module is not created\n");
+        return NULL;
+    }
+    if (new_ip_address != NULL)
+    {
+        void *check = check_ip_address(new_ip_address);
+        if (check == NULL)
+        {
+            fprintf(stderr, "Invalid IP address\n");
+            return NULL;
+        }
+        char query[QUERY_LENGTH];
+        sprintf(query, "UPDATE modules SET ip_address = '%s' WHERE id = %d", new_ip_address, *(module->id));
+        check = _update_data(conn, query);
+        if (check != NULL)
+            strcpy(module->ip_address, new_ip_address);
+    }
+    else
+    {
+        fprintf(stderr, "IP address not provided\n");
+        return NULL;
+    }
+    return module;
 }

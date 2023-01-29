@@ -55,10 +55,22 @@ void insert_cocktail(PGconn *conn, cocktail_t *cocktail)
         return;
     }
 
-    char query[1024];
+    char query[QUERY_LENGTH];
     sprintf(query, "INSERT INTO cocktails (price, image) VALUES (%f, '%s') RETURNING id", cocktail->price, cocktail->image);
     id_db_t id = _insert_data(conn, query);
     if (id == NULL)
         return;
     cocktail->id = id;
+}
+
+void delete_cocktail(PGconn *conn, id_db_t id)
+{
+    if (id == NULL)
+    {
+        fprintf(stderr, "Invalid id\n");
+        return;
+    }
+    char query[QUERY_LENGTH];
+    sprintf(query, "DELETE FROM cocktails WHERE id = %d", *id);
+    _delete_data(conn, query);
 }

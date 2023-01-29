@@ -40,4 +40,11 @@ void _print_cocktail(cocktail_t *cocktail);
  */
 void insert_cocktail(PGconn *conn, cocktail_t *cocktail);
 
+/**
+ * @brief Delete a cocktail from the database
+ * @param conn A pointer to a PGconn object
+ * @param id The id of the cocktail to delete
+ */
+void delete_cocktail(PGconn *conn, id_db_t id);
+
 #endif

@@ -39,4 +39,20 @@ void _print_module(module_t *module);
  */
 void insert_module(PGconn *conn, module_t *module);
 
+/**
+ * @brief Delete a module from the database
+ * @param conn A pointer to a PGconn object
+ * @param id The id of the module to delete
+ */
+void delete_module(PGconn *conn, id_db_t id);
+
+/**
+ * @brief Update a module in the database
+ * @param conn A pointer to a PGconn object
+ * @param module A pointer to a module_t object
+ * @param new_ip_address The new ip address of the module
+ * @return A pointer to NULL if the update failed
+ */
+void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address);
+
 #endif

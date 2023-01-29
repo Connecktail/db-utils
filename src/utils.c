@@ -43,14 +43,14 @@ void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, in
     return table;
 }
 
-void *check_insertion(PGconn *conn, PGresult *result)
+void *check_executed_query(PGconn *conn, PGresult *result)
 {
     if (PQresultStatus(result) != PGRES_COMMAND_OK && PQresultStatus(result) != PGRES_TUPLES_OK)
     {
-        fprintf(stderr, "Insertion failed: %s", PQerrorMessage(conn));
+        fprintf(stderr, "Query failed: %s", PQerrorMessage(conn));
         return NULL;
     }
-    return (void *)1;
+    return result;
 }
 
 int *check_ip_address(char *ip_address)
@@ -108,11 +108,39 @@ int *check_url(char *url)
 int *_insert_data(PGconn *conn, char *query)
 {
     PGresult *result = PQexec(conn, query);
-    void *check = check_insertion(conn, result);
+    void *check = check_executed_query(conn, result);
     if (check == NULL)
         return NULL;
     id_db_t id = malloc(sizeof(id_db_t));
     *id = atoi(PQgetvalue(result, 0, 0));
     PQclear(result);
     return id;
+}
+
+void *_delete_data(PGconn *conn, char *query)
+{
+    PGresult *result = PQexec(conn, query);
+    void *check = check_executed_query(conn, result);
+    if (check == NULL)
+        return NULL;
+    PQclear(result);
+    return result;
+}
+
+void *_update_data(PGconn *conn, char *query)
+{
+    PGresult *result = PQexec(conn, query);
+    void *check = check_executed_query(conn, result);
+    if (check == NULL)
+        return NULL;
+    PQclear(result);
+    return result;
+}
+
+char *_concatenate_formated(char *dst, char *src, int *dst_length)
+{
+    *dst_length += strlen(src);
+    dst = (char *)realloc(dst, *dst_length * sizeof(char));
+    strcat(dst, src);
+    return dst;
 }

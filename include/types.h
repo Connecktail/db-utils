@@ -12,4 +12,6 @@ typedef enum
     DOUBLE
 } types;
 
+#define QUERY_LENGTH 1024
+
 #endif

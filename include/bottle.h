@@ -43,4 +43,22 @@ void _print_bottle(bottle_t *bottle);
  */
 void insert_bottle(PGconn *conn, bottle_t *bottle);
 
+/**
+ * @brief Delete a bottle from the database
+ * @param conn A pointer to a PGconn object
+ * @param id The id of the bottle to delete
+ */
+void delete_bottle(PGconn *conn, id_db_t id);
+
+/**
+ * @brief Update a bottle in the database
+ * @param conn A pointer to a PGconn object
+ * @param module A pointer to a module_t object
+ * @param new_url The new url of the bottle
+ * @param new_quantity The new quantity of the bottle
+ * @param new_module_id The new module id of the bottle
+ * @return A pointer to NULL if the update failed
+ */
+void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_quantity, id_db_t new_module_id);
+
 #endif

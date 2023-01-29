@@ -138,6 +138,18 @@ bottle_t *create_bottle(PGresult *result, int row, int nbFields)
 void insert_bottle(PGconn *conn, bottle_t *bottle)
 ```
 
+- Delete a bottle from the database :
+
+```c
+void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
+```
+
+- Update a bottle in the database :
+
+```c
+void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_quantity, id_db_t new_module_id)
+```
+
 ### Modules
 
 - Get the list of modules :
@@ -158,6 +170,18 @@ module_t *create_module(PGresult *result, int row, int nbFields)
 void insert_module(PGconn *conn, module_t *module)
 ```
 
+- Delete a module from the database :
+
+```c
+void delete_module(PGconn *conn, id_db_t id)
+```
+
+- Update a module in the database :
+
+```c
+void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
+```
+
 ### Cocktails
 
 - Get the list of cocktails :
@@ -176,6 +200,12 @@ cocktail_t *create_cocktail(PGresult *result, int row, int nbFields)
 
 ```c
 void insert_cocktail(PGconn *conn, cocktail_t *cocktail)
+```
+
+- Delete a cocktail from the database :
+
+```c
+void delete_cocktail(PGconn *conn, id_db_t id)
 ```
 
 ### Functions not to use (used to develop)
@@ -204,6 +234,24 @@ int *_insert_data(PGconn *conn, char *query)
 
 ```c
 void *check_insertion(PGconn *conn, PGresult *result)
+```
+
+- Delete an object from the database :
+
+```c
+void *_delete_data(PGconn *conn, char *query)
+```
+
+- Update an object in the database :
+
+```c
+void *_update_data(PGconn *conn, char *query)
+```
+
+- Concatenate two strings and realloc the first one :
+
+```c
+char *_concatenate_formated(char *dst, char *src, int *dst_length)
 ```
 
 ### Notes :

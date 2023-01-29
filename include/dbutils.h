@@ -32,12 +32,12 @@ void db_disconnect(PGconn *conn);
 void *_loop_through_data(PGresult *result, void *(*callback)(PGresult *, int, int));
 
 /**
- * @brief Check if the insertion was successful
+ * @brief Check if the query was successfully executed
  * @param conn A pointer to a PGconn object
  * @param result A pointer to a PGresult object
- * @return A pointer to NULL if the insertion failed
+ * @return A pointer to NULL if the execution failed
  */
-void *check_insertion(PGconn *conn, PGresult *result);
+void *check_executed_query(PGconn *conn, PGresult *result);
 
 /**
  * @brief Check if the ip address is valid
@@ -68,5 +68,30 @@ int *check_url(char *url);
  * @return A pointer to NULL if the insertion failed otherwise a pointer to the id
  */
 int *_insert_data(PGconn *conn, char *query);
+
+/**
+ * @brief Delete an object from the database
+ * @param conn A pointer to a PGconn object
+ * @param query The query to execute
+ * @return A pointer to NULL if the deletion failed
+ */
+void *_delete_data(PGconn *conn, char *query);
+
+/**
+ * @brief Update an object in the database
+ * @param conn A pointer to a PGconn object
+ * @param query The query to execute
+ * @return A pointer to NULL if the update failed
+ */
+void *_update_data(PGconn *conn, char *query);
+
+/**
+ * @brief concatenate a formated string passed in param
+ * @param dst The string that will be concatenated
+ * @param src The string that will be appended to dst
+ * @param dst_length length of the string that will be concatenated
+ * @return A pointer to the concatenated string
+ */
+char *_concatenate_formated(char *dst, char *src, int *dst_length);
 
 #endif
