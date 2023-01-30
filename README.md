@@ -208,6 +208,12 @@ void insert_cocktail(PGconn *conn, cocktail_t *cocktail)
 void delete_cocktail(PGconn *conn, id_db_t id)
 ```
 
+- Update a cocktail in the database :
+
+```c
+void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_t *new_image)
+```
+
 ### Functions not to use (used to develop)
 
 - Loop though a query result :

@@ -74,3 +74,79 @@ void delete_cocktail(PGconn *conn, id_db_t id)
     sprintf(query, "DELETE FROM cocktails WHERE id = %d", *id);
     _delete_data(conn, query);
 }
+
+void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_t *new_image)
+{
+    if (cocktail == NULL)
+    {
+        fprintf(stderr, "Invalid cocktail\n");
+        return NULL;
+    }
+
+    if (new_price == NULL && new_image == NULL)
+    {
+        fprintf(stderr, "Nothing ot update\n");
+        return NULL;
+    }
+
+    char *query = (char *)calloc(20, sizeof(char));
+    char query_add[255];
+    sprintf(query_add, "UPDATE cocktails SET");
+    int query_length = strlen(query_add) + 1;
+    query = (char *)realloc(query, query_length * sizeof(char));
+    strcat(query, query_add);
+
+    if (new_price != NULL)
+    {
+        int *check = check_positive((void *)new_price, FLOAT);
+        if (check == NULL)
+        {
+            fprintf(stderr, "Invalid price\n");
+            return NULL;
+        }
+        strcpy(query_add, "");
+        sprintf(query_add, " price = %f,", *new_price);
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
+
+    if (new_image != NULL)
+    {
+        int *check = check_url(*new_image);
+        if (check == NULL)
+        {
+            fprintf(stderr, "Invalid URL\n");
+            return NULL;
+        }
+        strcpy(query_add, "");
+        sprintf(query_add, " image = '%s',", *new_image);
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
+
+    for (int i = query_length - 1; i >= 0; i--)
+    {
+        if (query[i] == ',')
+        {
+            query[i] = '\0';
+            break;
+        }
+    }
+
+    strcpy(query_add, "");
+    sprintf(query_add, " WHERE id = %d", *(cocktail->id));
+    query = _concatenate_formated(query, query_add, &query_length);
+
+    void *check = _update_data(conn, query);
+    if (check != NULL)
+    {
+        if (new_price != NULL)
+            cocktail->price = *new_price;
+        if (new_image != NULL)
+            strcpy(cocktail->image, *new_image);
+    }
+    else
+    {
+        printf("error on update\n");
+    }
+
+    return cocktail;
+}

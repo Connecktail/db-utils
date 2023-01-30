@@ -47,4 +47,14 @@ void insert_cocktail(PGconn *conn, cocktail_t *cocktail);
  */
 void delete_cocktail(PGconn *conn, id_db_t id);
 
+/**
+ * @brief Update a cocktail in the database
+ * @param conn A pointer to a PGconn object
+ * @param cocktail A pointer to a cocktail_t object
+ * @param new_price The new price of the cocktail
+ * @param new_image The new image of the cocktail
+ * @return A pointer to NULL if the update failed
+ */
+void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_t *new_image);
+
 #endif
