@@ -6,7 +6,7 @@
 cocktail_t *create_cocktail(PGresult *result, int row, int nbFields)
 {
     cocktail_t *cocktail = (cocktail_t *)malloc(sizeof(cocktail_t));
-    cocktail->id = (int *)malloc(sizeof(int));
+    cocktail->id = (id_db_t)malloc(sizeof(id_db_t));
     for (int i = 0; i < nbFields; i++)
     {
         if (strcmp(PQfname(result, i), "id") == 0)
@@ -33,8 +33,8 @@ cocktail_t **get_cocktails(PGconn *conn, int *length)
 
 void _print_cocktail(cocktail_t *cocktail)
 {
-    int id = cocktail->id == NULL ? -1 : *(cocktail->id);
-    printf("Cocktail[%d] {", id);
+    long long int id = cocktail->id == NULL ? -1 : *(cocktail->id);
+    printf("Cocktail[%lld] {", id);
     printf("price: %f, ", cocktail->price);
     printf("image: %s", cocktail->image);
     printf("}\n");
@@ -71,7 +71,7 @@ void delete_cocktail(PGconn *conn, id_db_t id)
         return;
     }
     char query[QUERY_LENGTH];
-    sprintf(query, "DELETE FROM cocktails WHERE id = %d", *id);
+    sprintf(query, "DELETE FROM cocktails WHERE id = %lld", *id);
     _delete_data(conn, query);
 }
 
@@ -132,7 +132,7 @@ void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_
     }
 
     strcpy(query_add, "");
-    sprintf(query_add, " WHERE id = %d", *(cocktail->id));
+    sprintf(query_add, " WHERE id = %lld", *(cocktail->id));
     query = _concatenate_formated(query, query_add, &query_length);
 
     void *check = _update_data(conn, query);

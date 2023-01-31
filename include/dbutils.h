@@ -59,7 +59,7 @@ int *check_positive(void *arg, types type);
  * @param url The url to check
  * @return A pointer to NULL if the url isn't valid
  */
-int *check_url(char *url);
+int *check_url(url_t url);
 
 /**
  * @brief Insert an object into the database, check the insertion and return id
@@ -67,7 +67,7 @@ int *check_url(char *url);
  * @param query The query to execute
  * @return A pointer to NULL if the insertion failed otherwise a pointer to the id
  */
-int *_insert_data(PGconn *conn, char *query);
+id_db_t _insert_data(PGconn *conn, char *query);
 
 /**
  * @brief Delete an object from the database

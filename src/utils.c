@@ -96,7 +96,7 @@ int *check_positive(void *arg, types type)
     return (int *)arg;
 }
 
-int *check_url(char *url)
+int *check_url(url_t url)
 {
     if (strncmp(url, "http://", 7) != 0 && strncmp(url, "https://", 8) != 0)
         return NULL;
@@ -105,7 +105,7 @@ int *check_url(char *url)
     return (int *)url;
 }
 
-int *_insert_data(PGconn *conn, char *query)
+id_db_t _insert_data(PGconn *conn, char *query)
 {
     PGresult *result = PQexec(conn, query);
     void *check = check_executed_query(conn, result);

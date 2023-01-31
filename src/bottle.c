@@ -6,7 +6,7 @@
 bottle_t *create_bottle(PGresult *result, int row, int nbFields)
 {
     bottle_t *bottle = (bottle_t *)malloc(sizeof(bottle_t));
-    bottle->id = (int *)malloc(sizeof(int));
+    bottle->id = (id_db_t)malloc(sizeof(id_db_t));
     for (int i = 0; i < nbFields; i++)
     {
         if (strcmp(PQfname(result, i), "id") == 0)
@@ -33,12 +33,12 @@ bottle_t **get_bottles(PGconn *conn, int *length)
 
 void _print_bottle(bottle_t *bottle)
 {
-    int id = bottle->id == NULL ? -1 : *(bottle->id);
-    int id_module = bottle->module == NULL ? -1 : *(bottle->module->id);
-    printf("Bottle[%d] {", id);
+    long long int id = bottle->id == NULL ? -1 : *(bottle->id);
+    long long int id_module = bottle->module == NULL ? -1 : *(bottle->module->id);
+    printf("Bottle[%lld] {", id);
     printf("url: %s, ", bottle->url);
     printf("quantity: %f, ", bottle->quantity);
-    printf("module: %d", id_module);
+    printf("module: %lld", id_module);
     printf("}\n");
 }
 
@@ -61,7 +61,7 @@ void insert_bottle(PGconn *conn, bottle_t *bottle)
     if (bottle->module == NULL)
         sprintf(query, "INSERT INTO bottles (quantity, url) VALUES (%f, '%s') RETURNING id", bottle->quantity, bottle->url);
     else
-        sprintf(query, "INSERT INTO bottles (quantity, url, id_module) VALUES (%f, '%s', %d) RETURNING id", bottle->quantity, bottle->url, *(bottle->module->id));
+        sprintf(query, "INSERT INTO bottles (quantity, url, id_module) VALUES (%f, '%s', %lld) RETURNING id", bottle->quantity, bottle->url, *(bottle->module->id));
 
     id_db_t id = _insert_data(conn, query);
     if (id == NULL)
@@ -80,7 +80,7 @@ void delete_bottle(PGconn *conn, id_db_t id)
         return;
     }
     char query[QUERY_LENGTH];
-    sprintf(query, "DELETE FROM bottles WHERE id = %d", *id);
+    sprintf(query, "DELETE FROM bottles WHERE id = %lld", *id);
     _delete_data(conn, query);
 }
 
@@ -132,7 +132,7 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_q
     if (new_module_id != NULL)
     {
         strcpy(query_add, "");
-        sprintf(query_add, " id_module = %d,", *new_module_id);
+        sprintf(query_add, " id_module = %lld,", *new_module_id);
         query = _concatenate_formated(query, query_add, &query_length);
     }
 
@@ -147,7 +147,7 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_q
     }
 
     strcpy(query_add, "");
-    sprintf(query_add, " WHERE id = %d", *(bottle->id));
+    sprintf(query_add, " WHERE id = %lld", *(bottle->id));
     query = _concatenate_formated(query, query_add, &query_length);
 
     void *check = _update_data(conn, query);

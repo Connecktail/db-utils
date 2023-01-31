@@ -233,7 +233,7 @@ example : `void _print_cocktail(cocktail_t *cocktail)`
 - Insert an object in the database :
 
 ```c
-int *_insert_data(PGconn *conn, char *query)
+id_db_t _insert_data(PGconn *conn, char *query)
 ```
 
 - Check if an insertion was successful :
