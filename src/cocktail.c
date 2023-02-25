@@ -11,10 +11,16 @@ cocktail_t *create_cocktail(PGresult *result, int row, int nbFields)
     {
         if (strcmp(PQfname(result, i), "id") == 0)
             *(cocktail->id) = atoi(PQgetvalue(result, row, i));
+        if (strcmp(PQfname(result, i), "name") == 0)
+            strcpy(cocktail->name, PQgetvalue(result, row, i));
+        if (strcmp(PQfname(result, i), "description") == 0)
+            strcpy(cocktail->description, PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "price") == 0)
             cocktail->price = atof(PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "image") == 0)
-            strcpy(cocktail->image, PQgetvalue(result, row, i));
+        if (strcmp(PQfname(result, i), "image_url") == 0)
+            strcpy(cocktail->image_url, PQgetvalue(result, row, i));
+        if (strcmp(PQfname(result, i), "personalized") == 0)
+            cocktail->personalized = atoi(PQgetvalue(result, row, i));
     }
     return cocktail;
 }
@@ -35,8 +41,11 @@ void _print_cocktail(cocktail_t *cocktail)
 {
     long long int id = cocktail->id == NULL ? -1 : *(cocktail->id);
     printf("Cocktail[%lld] {", id);
+    printf("name: %s, ", cocktail->name);
+    printf("description: %s, ", cocktail->description);
     printf("price: %f, ", cocktail->price);
-    printf("image: %s", cocktail->image);
+    printf("image_url: %s", cocktail->image_url);
+    printf("personalized: %s", cocktail->personalized ? "true" : "false");
     printf("}\n");
 }
 
@@ -48,7 +57,7 @@ void insert_cocktail(PGconn *conn, cocktail_t *cocktail)
         fprintf(stderr, "Invalid price\n");
         return;
     }
-    check = check_url(cocktail->image);
+    check = check_url(cocktail->image_url);
     if (check == NULL)
     {
         fprintf(stderr, "Invalid URL\n");
@@ -56,7 +65,7 @@ void insert_cocktail(PGconn *conn, cocktail_t *cocktail)
     }
 
     char query[QUERY_LENGTH];
-    sprintf(query, "INSERT INTO cocktails (price, image) VALUES (%f, '%s') RETURNING id", cocktail->price, cocktail->image);
+    sprintf(query, "INSERT INTO cocktails (name, description, price, image_url, personalized) VALUES ('%s', '%s', %f, '%s', %s) RETURNING id", cocktail->name, cocktail->description, cocktail->price, cocktail->image_url, cocktail->personalized ? "TRUE" : "FALSE");
     id_db_t id = _insert_data(conn, query);
     if (id == NULL)
         return;
@@ -75,7 +84,7 @@ void delete_cocktail(PGconn *conn, id_db_t id)
     _delete_data(conn, query);
 }
 
-void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_t *new_image)
+void *update_cocktail(PGconn *conn, cocktail_t *cocktail, char *new_name[255], char *new_description[255], float *new_price, url_t *new_image_url)
 {
     if (cocktail == NULL)
     {
@@ -83,7 +92,7 @@ void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_
         return NULL;
     }
 
-    if (new_price == NULL && new_image == NULL)
+    if (new_name == NULL && new_description == NULL && new_price == NULL && new_image_url == NULL)
     {
         fprintf(stderr, "Nothing ot update\n");
         return NULL;
@@ -95,6 +104,20 @@ void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_
     int query_length = strlen(query_add) + 1;
     query = (char *)realloc(query, query_length * sizeof(char));
     strcat(query, query_add);
+
+    if (new_name != NULL)
+    {
+        strcpy(query_add, "");
+        sprintf(&query_add, " name = '%s',", new_name);
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
+
+    if (new_description != NULL)
+    {
+        strcpy(query_add, "");
+        sprintf(query_add, " description = '%s',", new_description);
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
 
     if (new_price != NULL)
     {
@@ -109,16 +132,16 @@ void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_
         query = _concatenate_formated(query, query_add, &query_length);
     }
 
-    if (new_image != NULL)
+    if (new_image_url != NULL)
     {
-        int *check = check_url(*new_image);
+        int *check = check_url(*new_image_url);
         if (check == NULL)
         {
             fprintf(stderr, "Invalid URL\n");
             return NULL;
         }
         strcpy(query_add, "");
-        sprintf(query_add, " image = '%s',", *new_image);
+        sprintf(query_add, " image_url = '%s',", *new_image_url);
         query = _concatenate_formated(query, query_add, &query_length);
     }
 
@@ -138,10 +161,14 @@ void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_
     void *check = _update_data(conn, query);
     if (check != NULL)
     {
+        if (new_name != NULL)
+            strcpy(cocktail->name, new_name);
+        if (new_description != NULL)
+            strcpy(cocktail->description, new_description);
         if (new_price != NULL)
             cocktail->price = *new_price;
-        if (new_image != NULL)
-            strcpy(cocktail->image, *new_image);
+        if (new_image_url != NULL)
+            strcpy(cocktail->image_url, *new_image_url);
     }
     else
     {

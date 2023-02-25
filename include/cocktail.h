@@ -6,8 +6,11 @@
 typedef struct
 {
     id_db_t id;
+    char name[255];
+    char description[255];
     float price;
-    url_t image;
+    url_t image_url;
+    bool personalized;
 } cocktail_t;
 
 /**
@@ -22,7 +25,7 @@ cocktail_t *create_cocktail(PGresult *result, int row, int nbFields);
 /**
  * @brief Get all the cocktails from the database
  * @param conn A pointer to a PGconn object
- * @param length A pointer to an int that will contain the length of the array
+ * @param length A pointer to an int that will contain the length of the array 
  * @return A pointer to a cocktail array
  */
 cocktail_t **get_cocktails(PGconn *conn, int *length);
@@ -51,10 +54,12 @@ void delete_cocktail(PGconn *conn, id_db_t id);
  * @brief Update a cocktail in the database
  * @param conn A pointer to a PGconn object
  * @param cocktail A pointer to a cocktail_t object
+ * @param new_name The new name of the cocktail
+ * @param new_description The new description of the cocktail
  * @param new_price The new price of the cocktail
- * @param new_image The new image of the cocktail
+ * @param new_image_url The new image of the cocktail
  * @return A pointer to NULL if the update failed
  */
-void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_t *new_image);
+void *update_cocktail(PGconn *conn, cocktail_t *cocktail, char *new_name[255], char *new_description[255], float *new_price, url_t *new_image_url);
 
 #endif

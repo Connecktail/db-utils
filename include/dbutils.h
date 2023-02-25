@@ -94,4 +94,10 @@ void *_update_data(PGconn *conn, char *query);
  */
 char *_concatenate_formated(char *dst, char *src, int *dst_length);
 
+/**
+ * @brief format a string to be used in a sql string query
+ * @param target The string to format, the string will be modified
+*/
+void format_string(char *target);
+
 #endif

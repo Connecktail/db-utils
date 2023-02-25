@@ -11,10 +11,14 @@ bottle_t *create_bottle(PGresult *result, int row, int nbFields)
     {
         if (strcmp(PQfname(result, i), "id") == 0)
             *(bottle->id) = atoi(PQgetvalue(result, row, i));
+        if (strcmp(PQfname(result, i), "name") == 0)
+            strcpy(bottle->name, PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "quantity") == 0)
             bottle->quantity = atoi(PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "url") == 0)
             strcpy(bottle->url, PQgetvalue(result, row, i));
+        if (strcmp(PQfname(result, i), "price") == 0)
+            bottle->price = atoi(PQgetvalue(result, row, i));
     }
     bottle->module = create_module(result, row, nbFields);
     return bottle;
@@ -22,7 +26,7 @@ bottle_t *create_bottle(PGresult *result, int row, int nbFields)
 
 bottle_t **get_bottles(PGconn *conn, int *length)
 {
-    PGresult *result = PQexec(conn, "SELECT * FROM bottles, modules WHERE bottles.id_module = modules.id");
+    PGresult *result = PQexec(conn, "SELECT * FROM bottles LEFT OUTER JOIN modules ON bottles.id_module = modules.mac_address ORDER BY id");
     bottle_t **bottles = (bottle_t **)_loop_through_data(result, &create_bottle);
     *length = PQntuples(result);
     if (bottles == NULL)
@@ -34,11 +38,14 @@ bottle_t **get_bottles(PGconn *conn, int *length)
 void _print_bottle(bottle_t *bottle)
 {
     long long int id = bottle->id == NULL ? -1 : *(bottle->id);
-    long long int id_module = bottle->module == NULL ? -1 : *(bottle->module->id);
+    mac_address_t id_module;
+    strcpy(id_module, (bottle->module == NULL)?" ":(bottle->module->mac_address));
     printf("Bottle[%lld] {", id);
+    printf("name: %s, ", bottle->name);
     printf("url: %s, ", bottle->url);
     printf("quantity: %f, ", bottle->quantity);
-    printf("module: %lld", id_module);
+    printf("module: %s, ", id_module);
+    printf("price: %f", bottle->price);
     printf("}\n");
 }
 
@@ -57,12 +64,15 @@ void insert_bottle(PGconn *conn, bottle_t *bottle)
         return;
     }
 
+    char name[255];
+    strcpy(name, bottle->name);
+    format_string(name);
     char query[QUERY_LENGTH];
     if (bottle->module == NULL)
-        sprintf(query, "INSERT INTO bottles (quantity, url) VALUES (%f, '%s') RETURNING id", bottle->quantity, bottle->url);
-    else
-        sprintf(query, "INSERT INTO bottles (quantity, url, id_module) VALUES (%f, '%s', %lld) RETURNING id", bottle->quantity, bottle->url, *(bottle->module->id));
-
+        sprintf(query, "INSERT INTO bottles (name, quantity, url, price) VALUES ('%s', %f, '%s', %f) RETURNING id", name, bottle->quantity, bottle->url, bottle->price);
+    else{
+        sprintf(query, "INSERT INTO bottles (name, quantity, url, id_module, price) VALUES ('%s', %f, '%s', '%s', %f) RETURNING id", name, bottle->quantity, bottle->url, (bottle->module->mac_address), bottle->price);
+    }
     id_db_t id = _insert_data(conn, query);
     if (id == NULL)
     {
@@ -84,7 +94,7 @@ void delete_bottle(PGconn *conn, id_db_t id)
     _delete_data(conn, query);
 }
 
-void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_quantity, id_db_t new_module_id)
+void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *new_url, float *new_quantity, module_t *new_module, float *new_price)
 {
     if (bottle == NULL)
     {
@@ -92,7 +102,7 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_q
         return NULL;
     }
 
-    if (new_url == NULL && new_quantity == NULL && new_module_id == NULL)
+    if (new_name == NULL && new_url == NULL && new_quantity == NULL && new_module == NULL && new_price == NULL)
     {
         fprintf(stderr, "Nothing to update\n");
         return NULL;
@@ -105,6 +115,12 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_q
     query = (char *)realloc(query, query_length * sizeof(char));
     strcat(query, query_add);
 
+    if (new_name != NULL)
+    {
+        strcpy(query_add, "");
+        sprintf(query_add, " name = '%s',", new_name);
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
     if (new_url != NULL)
     {
         int *check = check_url(*new_url);
@@ -129,10 +145,22 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_q
         sprintf(query_add, " quantity = %f,", *new_quantity);
         query = _concatenate_formated(query, query_add, &query_length);
     }
-    if (new_module_id != NULL)
-    {
+    if (new_module != NULL)
+    {   
         strcpy(query_add, "");
-        sprintf(query_add, " id_module = %lld,", *new_module_id);
+        sprintf(query_add, " id_module = '%s',", (new_module)->mac_address);
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
+    if (new_price != NULL)
+    {
+        int *check = check_positive((void *)new_price, FLOAT);
+        if (check == NULL)
+        {
+            fprintf(stderr, "Bottle price must be positive\n");
+            return NULL;
+        }
+        strcpy(query_add, "");
+        sprintf(query_add, " price = %f,", *new_price);
         query = _concatenate_formated(query, query_add, &query_length);
     }
 
@@ -153,9 +181,11 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_q
     void *check = _update_data(conn, query);
     if (check != NULL)
     {
+        strcpy(bottle->name, new_name == NULL ? bottle->name : new_name);
         strcpy(bottle->url, new_url == NULL ? bottle->url : *new_url);
         bottle->quantity = new_quantity == NULL ? bottle->quantity : *new_quantity;
-        bottle->module = new_module_id == NULL ? bottle->module : *new_module_id;
+        bottle->module = new_module == NULL ? bottle->module : new_module;
+        bottle->price = new_price == NULL ? bottle->price : *new_price;
     }
     else
     {

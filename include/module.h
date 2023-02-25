@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    id_db_t id;
+    mac_address_t mac_address;
     ip_address_t ip_address;
 } module_t;
 
@@ -42,9 +42,9 @@ void insert_module(PGconn *conn, module_t *module);
 /**
  * @brief Delete a module from the database
  * @param conn A pointer to a PGconn object
- * @param id The id of the module to delete
+ * @param mac_adress The mac address of the module to delete
  */
-void delete_module(PGconn *conn, id_db_t id);
+void delete_module(PGconn *conn, mac_address_t mac_address);
 
 /**
  * @brief Update a module in the database

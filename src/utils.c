@@ -144,3 +144,32 @@ char *_concatenate_formated(char *dst, char *src, int *dst_length)
     strcat(dst, src);
     return dst;
 }
+
+
+void format_string(char *target)
+{
+    char buffer[1024] = { 0 };
+    char *insert_point = &buffer[0];
+    const char *tmp = target;
+    size_t needle_len = 1;
+    size_t repl_len = 2;
+
+    while (1) {
+        const char *p = strstr(tmp, "'");
+
+        if (p == NULL) {
+            strcpy(insert_point, tmp);
+            break;
+        }
+
+        memcpy(insert_point, tmp, p - tmp);
+        insert_point += p - tmp;
+
+        memcpy(insert_point, "''", repl_len);
+        insert_point += repl_len;
+
+        tmp = p + needle_len;
+    }
+
+    strcpy(target, buffer);
+}

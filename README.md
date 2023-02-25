@@ -44,7 +44,7 @@ Some structs have been defined in order to corresponding to a row in each table 
 ```c
 typedef struct
 {
-    id_db_t id;
+    mac_address_t mac_address;
     ip_address_t ip_address;
 } module_t;
 
@@ -56,9 +56,11 @@ typedef struct
 typedef struct
 {
     id_db_t id;
+    char name[255];
     url_t url;
     float quantity;
     module_t *module;
+    float price;
 } bottle_t;
 ```
 
@@ -68,8 +70,11 @@ typedef struct
 typedef struct
 {
     id_db_t id;
+    char name[255];
+    char description[255];
     float price;
-    url_t image;
+    url_t image_url;
+    bool personalized;
 } cocktail_t;
 ```
 
@@ -147,7 +152,7 @@ void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
 - Update a bottle in the database :
 
 ```c
-void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_quantity, id_db_t new_module_id)
+void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *new_url, float *new_quantity, module_t *new_module, float *new_price)
 ```
 
 ### Modules
@@ -173,7 +178,7 @@ void insert_module(PGconn *conn, module_t *module)
 - Delete a module from the database :
 
 ```c
-void delete_module(PGconn *conn, id_db_t id)
+void delete_module(PGconn *conn, mac_address_t mac_address)
 ```
 
 - Update a module in the database :
@@ -259,6 +264,13 @@ void *_update_data(PGconn *conn, char *query)
 ```c
 char *_concatenate_formated(char *dst, char *src, int *dst_length)
 ```
+
+- Format string to be used in a sql request (e.g. add quotes) :
+
+```c
+void format_string(char *target)
+```
+
 
 ### Notes :
 

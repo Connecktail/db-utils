@@ -7,9 +7,11 @@
 typedef struct
 {
     id_db_t id;
+    char name[255];
     url_t url;
     float quantity;
     module_t *module;
+    float price;
 } bottle_t;
 
 /**
@@ -54,11 +56,13 @@ void delete_bottle(PGconn *conn, id_db_t id);
  * @brief Update a bottle in the database
  * @param conn A pointer to a PGconn object
  * @param module A pointer to a module_t object
+ * @param new_name The new name of the bottle
  * @param new_url The new url of the bottle
  * @param new_quantity The new quantity of the bottle
- * @param new_module_id The new module id of the bottle
+ * @param new_module The new module of the bottle
+ * @param new_price The new price of the bottle
  * @return A pointer to NULL if the update failed
  */
-void *update_bottle(PGconn *conn, bottle_t *bottle, url_t *new_url, float *new_quantity, id_db_t new_module_id);
+void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *new_url, float *new_quantity, module_t *new_module, float *new_price);
 
 #endif
