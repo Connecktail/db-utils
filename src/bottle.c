@@ -9,15 +9,15 @@ bottle_t *create_bottle(PGresult *result, int row, int nbFields)
     bottle->id = (id_db_t)malloc(sizeof(id_db_t));
     for (int i = 0; i < nbFields; i++)
     {
-        if (strcmp(PQfname(result, i), "id") == 0)
+        if (strcmp(PQfname(result, i), "id_b") == 0)
             *(bottle->id) = atoi(PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "name") == 0)
+        if (strcmp(PQfname(result, i), "name_b") == 0)
             strcpy(bottle->name, PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "quantity") == 0)
+        if (strcmp(PQfname(result, i), "quantity_b") == 0)
             bottle->quantity = atoi(PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "url") == 0)
+        if (strcmp(PQfname(result, i), "url_b") == 0)
             strcpy(bottle->url, PQgetvalue(result, row, i));
-        if (strcmp(PQfname(result, i), "price") == 0)
+        if (strcmp(PQfname(result, i), "price_b") == 0)
             bottle->price = atoi(PQgetvalue(result, row, i));
     }
     bottle->module = create_module(result, row, nbFields);
@@ -26,7 +26,9 @@ bottle_t *create_bottle(PGresult *result, int row, int nbFields)
 
 bottle_t **get_bottles(PGconn *conn, int *length)
 {
-    PGresult *result = PQexec(conn, "SELECT * FROM bottles LEFT OUTER JOIN modules ON bottles.id_module = modules.mac_address ORDER BY id");
+    PGresult *result = PQexec(
+        conn, 
+        "SELECT b.id AS id_b, b.name AS name_b, b.quantity AS quantity_b, b.url AS url_b, b.price AS price_b, m.mac_address, m.ip_address FROM bottles AS b LEFT OUTER JOIN modules AS m ON b.id_module = m.mac_address ORDER BY id");
     bottle_t **bottles = (bottle_t **)_loop_through_data(result, &create_bottle);
     *length = PQntuples(result);
     if (bottles == NULL)
