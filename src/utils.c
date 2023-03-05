@@ -173,3 +173,15 @@ void format_string(char *target)
 
     strcpy(target, buffer);
 }
+
+date_t create_date(char *date)
+{
+    date_t date_t;
+    sscanf(date, "%d-%d-%d %d:%d", &date_t.year, &date_t.month, &date_t.day, &date_t.hour, &date_t.minute);
+    return date_t;
+}
+
+void print_date(date_t date)
+{
+    printf("%d-%d-%d %d:%d", date.year, date.month, date.day, date.hour, date.minute);
+}

@@ -78,6 +78,34 @@ typedef struct
 } cocktail_t;
 ```
 
+**Step**
+
+```c
+typedef struct
+{
+    id_db_t id;
+    float quantity;
+    char description[255];
+    id_db_t id_cocktail;
+    bottle_t *bottle;
+    char message[255];
+} step_t;
+```
+
+**Order**
+
+```c
+typedef struct
+{
+    id_db_t id;
+    date_t date;
+    float price;
+    bool status;
+    int nb_cocktails;
+    cocktail_t **cocktails;
+} order_t;
+```
+
 ## Functions :
 
 ### Utils
@@ -255,6 +283,20 @@ void delete_step(PGconn *conn, id_db_t id)
 
 ```c
 void *update_step(PGconn *conn, step_t *step, float *new_quantity, char *new_desc[255], bottle_t *new_bottle, char *new_message[255])
+```
+
+### Orders
+
+- Get the list of orders :
+
+```c
+order_t **get_orders(PGconn *conn, int *length)
+```
+
+- Create an order :
+
+```c
+order_t *create_order(PGresult *result, int row, int nbFields)
 ```
 
 ### Functions not to use (used to develop)

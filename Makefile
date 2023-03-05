@@ -9,7 +9,7 @@ INCLUDE=include
 STATIC=$(BUILD)/libdb-utils.a
 SHARED=$(BUILD)/libdb-utils.so
 
-OBJECTS_FILES=$(OBJECTS)/utils.o $(OBJECTS)/bottle.o $(OBJECTS)/cocktail.o $(OBJECTS)/module.o $(OBJECTS)/step.o
+OBJECTS_FILES=$(OBJECTS)/utils.o $(OBJECTS)/bottle.o $(OBJECTS)/cocktail.o $(OBJECTS)/module.o $(OBJECTS)/step.o $(OBJECTS)/order.o
 
 all: $(STATIC) $(SHARED)
 

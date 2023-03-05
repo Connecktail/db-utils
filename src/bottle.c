@@ -14,11 +14,11 @@ bottle_t *create_bottle(PGresult *result, int row, int nbFields)
         if (strcmp(PQfname(result, i), "name_b") == 0)
             strcpy(bottle->name, PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "quantity_b") == 0)
-            bottle->quantity = atoi(PQgetvalue(result, row, i));
+            bottle->quantity = atof(PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "url_b") == 0)
             strcpy(bottle->url, PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "price_b") == 0)
-            bottle->price = atoi(PQgetvalue(result, row, i));
+            bottle->price = atof(PQgetvalue(result, row, i));
     }
     bottle->module = create_module(result, row, nbFields);
     return bottle;

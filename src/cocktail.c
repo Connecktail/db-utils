@@ -40,7 +40,6 @@ cocktail_t **get_cocktails(PGconn *conn, int *length)
 cocktail_t **get_order_cocktails(PGconn *conn, int *length, id_db_t id_order) {
     char query[QUERY_LENGTH];
     sprintf(query, "SELECT c.* FROM cocktails AS c, cocktails_orders AS c_o WHERE c.id = c_o.id_cocktail AND c_o.id_order = %lld", *id_order);
-    printf("avant\n");
     PGresult *result = PQexec(conn, query);
 
     cocktail_t **cocktails = (cocktail_t **)_loop_through_data(result, (void *)*&create_cocktail);

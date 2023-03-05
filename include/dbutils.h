@@ -7,7 +7,7 @@
 #include "module.h"
 #include "cocktail.h"
 #include "step.h"
-// #include "order.h"
+#include "order.h"
 
 /**
  * @brief Connect to a database
@@ -100,5 +100,18 @@ char *_concatenate_formated(char *dst, char *src, int *dst_length);
  * @param target The string to format, the string will be modified
 */
 void format_string(char *target);
+
+/**
+ * @brief create a date_t object from a string
+ * @param date A string representing a date
+ * @return A date_t object
+*/
+date_t create_date(char *date);
+
+/**
+ * @brief print a date, used for debugging
+ * @param date A date_t object
+*/
+void print_date(date_t date);
 
 #endif

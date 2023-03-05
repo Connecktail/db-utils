@@ -13,7 +13,7 @@ step_t *create_step(PGresult *result, int row, int nbFields)
         if (strcmp(PQfname(result, i), "id_s") == 0)
             *(step->id) = atoi(PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "quantity_s") == 0)
-            step->quantity = atoi(PQgetvalue(result, row, i));
+            step->quantity = atof(PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "description_s") == 0)
             strcpy(step->description, PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "id_cocktail_s") == 0)
