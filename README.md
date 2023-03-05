@@ -195,6 +195,12 @@ void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
 cocktail_t **get_cocktails(PGconn *conn, int *length)
 ```
 
+- Get the list of cocktails of a specifig order:
+
+```c
+cocktail_t **get_order_cocktails(PGconn *conn, int *length, id_db_t id_order)
+```
+
 - Create a cocktail :
 
 ```c
@@ -217,6 +223,38 @@ void delete_cocktail(PGconn *conn, id_db_t id)
 
 ```c
 void *update_cocktail(PGconn *conn, cocktail_t *cocktail, float *new_price, url_t *new_image)
+```
+
+### Steps
+
+- Get the list of steps of a cocktail :
+
+```c
+step_t **get_cocktail_steps(PGconn *conn, int *length, id_db_t id_cocktail)
+```
+
+- Create a step :
+
+```c
+step_t *create_step(PGresult *result, int row, int nbFields)
+```
+
+- Insert a cocktail step in the database :
+
+```c
+void insert_step(PGconn *conn, step_t *step)
+```
+
+- Delete a step from the database :
+
+```c
+void delete_step(PGconn *conn, id_db_t id)
+```
+
+- Update a step in the database :
+
+```c
+void *update_step(PGconn *conn, step_t *step, float *new_quantity, char *new_desc[255], bottle_t *new_bottle, char *new_message[255])
 ```
 
 ### Functions not to use (used to develop)
