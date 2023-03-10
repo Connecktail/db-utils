@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "../include/dbutils.h"
 
@@ -21,6 +22,19 @@ order_t *create_order(PGresult *result, int row, int nbFields)
             order->status = atoi(PQgetvalue(result, row, i));
     }
 
+    return order;
+}
+
+order_t *get(PGconn *conn, id_db_t id) {
+    char query[QUERY_LENGTH];
+    sprintf(query, "SELECT o.*, COUNT(c_o.id) as nb_cocktails FROM orders AS o, cocktails_orders AS c_o WHERE o.id = c_o.id_order AND o.id=%lld GROUP BY o.id", *id);
+    PGresult *result = PQexec(conn, query);
+    order_t **orders = (order_t **)_loop_through_data(result, &create_order);
+    if (orders == NULL)
+        return NULL;
+    PQclear(result);
+    order_t *order = orders[0];
+    order->cocktails = get_order_cocktails(conn, &order->nb_cocktails, order->id);
     return order;
 }
 
@@ -57,4 +71,40 @@ void _print_order(order_t *order)
         _print_cocktail(order->cocktails[i]);
     }
     printf("}\n");
+}
+
+void insert_order(PGconn *conn, order_t *order) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    
+    // insert order
+    int *check = check_positive((void *)&(order->price), FLOAT);
+    if (check == NULL)
+    {
+        fprintf(stderr, "Invalid price\n");
+        return;
+    }
+    order->status = 0;
+    order->date.year = tm.tm_year + 1900;
+    order->date.month = tm.tm_mon + 1;
+    order->date.day = tm.tm_mday;
+    order->date.hour = tm.tm_hour;
+    order->date.minute = tm.tm_min;
+
+    char query[QUERY_LENGTH];
+    sprintf(query, "INSERT INTO orders (date, price, status) VALUES (NOW(), %f, FALSE) RETURNING id", order->price);
+    id_db_t id = _insert_data(conn, query);
+    if (id == NULL)
+        return;
+    order->id = id;
+
+    // insert personnalized cocktails and link them to the order
+    for (int i = 0; i < order->nb_cocktails; i++)
+    {
+        if(order->cocktails[i]->personalized == 1){
+            insert_cocktail(conn, order->cocktails[i]);
+        }
+        sprintf(query, "INSERT INTO cocktails_orders (id_cocktail, id_order) VALUES (%lld, %lld) RETURNING id", *order->cocktails[i]->id, *order->id);
+        _insert_data(conn, query);
+    }
 }

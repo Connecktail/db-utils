@@ -287,6 +287,12 @@ void *update_step(PGconn *conn, step_t *step, float *new_quantity, char *new_des
 
 ### Orders
 
+- Get an order by id :
+
+```c
+order_t *get(PGconn *conn, id_db_t id)
+```
+
 - Get the list of orders :
 
 ```c
@@ -297,6 +303,12 @@ order_t **get_orders(PGconn *conn, int *length)
 
 ```c
 order_t *create_order(PGresult *result, int row, int nbFields)
+```
+
+- Insert an order (also insert the personnalized cocktails in the cocktails table, and the links in the cocktails_orders table):
+
+```c
+void insert_order(PGconn *conn, order_t *order)
 ```
 
 ### Functions not to use (used to develop)

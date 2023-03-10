@@ -45,9 +45,10 @@ order_t *create_order(PGresult *result, int row, int nbFields);
 void _print_order(order_t *order);
 
 /**
- * @brief Insert an order in the database
+ * @brief Insert an order in the database and the cocktails dependencies in the cocktails_orders table, and insert the cocktails in the cocktails table if they are personalized
  * @param conn A pointer to a PGconn object
  * @param order A pointer to a order_t object
+ * @note The nb_cocktails field of the order must be set and of the right value so the cocktails array can be iterated
  */
 void insert_order(PGconn *conn, order_t *order);
 
