@@ -114,4 +114,11 @@ date_t create_date(char *date);
 */
 void print_date(date_t date);
 
+/**
+ * @brief convert character 'f', 't' or '' into int 0, 1 or 2
+ * @param car A character ('f', 't' or '')
+ * @return 0 for 'f', 1 for 't' and 2 for ''
+*/
+int convert_bool(char car);
+
 #endif

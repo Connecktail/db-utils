@@ -8,7 +8,7 @@ typedef struct
     id_db_t id;
     date_t date;
     float price;
-    bool status;
+    int status; // 0 = false in db, 1 = true in db, 2 = NULL in db
     int nb_cocktails;
     cocktail_t **cocktails;
 } order_t;
@@ -60,16 +60,13 @@ void insert_order(PGconn *conn, order_t *order);
 void delete_order(PGconn *conn, id_db_t id);
 
 /**
- * @brief Update a bottle in the database
+ * @brief Update an order in the database
  * @param conn A pointer to a PGconn object
- * @param bottle A pointer to a bottle_t object
- * @param new_name The new name of the bottle
- * @param new_url The new url of the bottle
- * @param new_quantity The new quantity of the bottle
- * @param new_module The new module of the bottle
- * @param new_price The new price of the bottle
+ * @param order A pointer to a order_t object
+ * @param new_price The new price of the order
+ * @param new_status The new status of the order -> 0 for false, 1 for true, 2 for NULL
  * @return A pointer to NULL if the update failed
  */
-void *update_order(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *new_url, float *new_quantity, module_t *new_module, float *new_price);
+void *update_order(PGconn *conn, order_t *order, float *new_price, int *new_status);
 
 #endif

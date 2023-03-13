@@ -311,6 +311,12 @@ order_t *create_order(PGresult *result, int row, int nbFields)
 void insert_order(PGconn *conn, order_t *order)
 ```
 
+- Update an order (can only update the price and the status):
+
+```c
+void *update_order(PGconn *conn, order_t *order, float *new_price, int *new_status)
+```
+
 ### Functions not to use (used to develop)
 
 - Loop though a query result :

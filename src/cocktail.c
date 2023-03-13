@@ -20,7 +20,7 @@ cocktail_t *create_cocktail(PGresult *result, int row, int nbFields)
         if (strcmp(PQfname(result, i), "image_url") == 0)
             strcpy(cocktail->image_url, PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "personalized") == 0)
-            cocktail->personalized = atoi(PQgetvalue(result, row, i));
+            cocktail->personalized = convert_bool(PQgetvalue(result, row, i)[0]);
     }
     return cocktail;
 }

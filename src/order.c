@@ -19,7 +19,7 @@ order_t *create_order(PGresult *result, int row, int nbFields)
         if (strcmp(PQfname(result, i), "nb_cocktails") == 0)
             order->nb_cocktails = atoi(PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "status") == 0)
-            order->status = atoi(PQgetvalue(result, row, i));
+            order->status = convert_bool(PQgetvalue(result, row, i)[0]);
     }
 
     return order;
@@ -107,4 +107,75 @@ void insert_order(PGconn *conn, order_t *order) {
         sprintf(query, "INSERT INTO cocktails_orders (id_cocktail, id_order) VALUES (%lld, %lld) RETURNING id", *order->cocktails[i]->id, *order->id);
         _insert_data(conn, query);
     }
+}
+
+
+void *update_order(PGconn *conn, order_t *order, float *new_price, int *new_status)
+{
+    if (order == NULL)
+    {
+        fprintf(stderr, "Invalid bottle\n");
+        return NULL;
+    }
+
+    if (new_price == NULL && new_status == NULL)
+    {
+        fprintf(stderr, "Nothing to update\n");
+        return NULL;
+    }
+
+    char *query = (char *)calloc(20, sizeof(char));
+    char query_add[255];
+    sprintf(query_add, "UPDATE orders SET");
+    int query_length = strlen(query_add) + 1;
+    query = (char *)realloc(query, query_length * sizeof(char));
+    strcat(query, query_add);
+
+    if (new_price != NULL)
+    {
+        int *check = check_positive((void *)new_price, FLOAT);
+        if (check == NULL)
+        {
+            fprintf(stderr, "Order price must be positive\n");
+            return NULL;
+        }
+        strcpy(query_add, "");
+        sprintf(query_add, " price = %f,", *new_price);
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
+    if (new_status != NULL)
+    {   
+        strcpy(query_add, "");
+        sprintf(query_add, " status = %s,", (*new_status==1?"TRUE":((*new_status==2)?"NULL":"FALSE")));
+        query = _concatenate_formated(query, query_add, &query_length);
+    }
+
+    // Remove the comma from last edit
+    for (int i = query_length - 1; i >= 0; i--)
+    {
+        if (query[i] == ',')
+        {
+            query[i] = '\0';
+            break;
+        }
+    }
+
+    strcpy(query_add, "");
+    sprintf(query_add, " WHERE id = %lld", *(order->id));
+    query = _concatenate_formated(query, query_add, &query_length);
+
+    printf("query: %s\n", query);
+
+    void *check = _update_data(conn, query);
+    if (check != NULL)
+    {
+        order->price = new_price == NULL ? order->price : *new_price;
+        order->status = new_status == NULL ? order->status : ((*new_status==2)?NULL:*new_status);
+    }
+    else
+    {
+        printf("error on update\n");
+    }
+
+    return order;
 }

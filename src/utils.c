@@ -185,3 +185,17 @@ void print_date(date_t date)
 {
     printf("%d-%d-%d %d:%d", date.year, date.month, date.day, date.hour, date.minute);
 }
+
+int convert_bool(char car) {
+    switch(car) {
+        case 't':
+            return 1;
+            break;
+        case 'f':
+            return 0;
+            break;
+        default:
+            return 2;
+            break;
+    }
+}
