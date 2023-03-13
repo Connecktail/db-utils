@@ -100,7 +100,7 @@ typedef struct
     id_db_t id;
     date_t date;
     float price;
-    bool status;
+    int status; // 0 = false in db, 1 = true in db, 2 = NULL in db
     int nb_cocktails;
     cocktail_t **cocktails;
 } order_t;
@@ -369,6 +369,17 @@ char *_concatenate_formated(char *dst, char *src, int *dst_length)
 void format_string(char *target)
 ```
 
+- Create a date_t object from a string
+
+```c
+date_t create_date(char *date)
+```
+
+- Convert character ('f', 't' or '') into a int (0, 1 or 2)
+
+```c
+int convert_bool(char car)
+```
 
 ### Notes :
 
