@@ -31,6 +31,14 @@ cocktail_t *create_cocktail(PGresult *result, int row, int nbFields);
 cocktail_t **get_cocktails(PGconn *conn, int *length);
 
 /**
+ * @brief Get a cocktail from the database
+ * @param conn A pointer to a PGconn object
+ * @param id The id of the cocktail to get
+ * @return A pointer to a cocktail_t object
+*/
+cocktail_t *get_cocktail_by_id(PGconn *conn, id_db_t id);
+
+/**
  * @brief Get all the cocktails of an order from the database
  * @param conn A pointer to a PGconn object
  * @param length A pointer to an int that will contain the length of the array 
