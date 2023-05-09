@@ -96,3 +96,11 @@ void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
     }
     return module;
 }
+
+int is_associated(PGconn *conn, module_t *module)
+{
+    char query[QUERY_LENGTH];
+    sprintf(query, "SELECT EXISTS(SELECT * FROM bottles WHERE id_module = '%s')", module->mac_address);
+    PGresult *res = PQexec(conn, query);
+    return convert_bool(PQgetvalue(res, 0, 0)[0]);
+}

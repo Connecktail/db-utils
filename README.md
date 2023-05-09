@@ -215,6 +215,11 @@ void delete_module(PGconn *conn, mac_address_t mac_address)
 void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
 ```
 
+- Know if a module is associated to a bottle : 
+```c
+int is_associated(PGconn *conn, module_t *module)
+```
+
 ### Cocktails
 
 - Get the list of cocktails :
