@@ -55,4 +55,12 @@ void delete_module(PGconn *conn, mac_address_t mac_address);
  */
 void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address);
 
+/**
+ * @brief Know if a module is associated to a bottle
+ * @param conn A pointer to a PGconn object
+ * @param module A pointer to a module_t object
+ * @return 1 if the module is associated, 0 otherwise
+ */
+int is_associated(PGconn *conn, module_t *module);
+
 #endif
