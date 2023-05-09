@@ -37,6 +37,18 @@ cocktail_t **get_cocktails(PGconn *conn, int *length)
     return cocktails;
 }
 
+cocktail_t *get_cocktail_by_id(PGconn *conn, id_db_t id) {
+    char query[QUERY_LENGTH];
+    sprintf(query, "SELECT * FROM cocktails WHERE id=%lld", *id);
+    PGresult *result = PQexec(conn, query);
+    cocktail_t **cocktails = (cocktail_t **)_loop_through_data(result, &create_cocktail);
+    if (cocktails == NULL)
+        return NULL;
+    PQclear(result);
+    cocktail_t *cocktail = cocktails[0];
+    return cocktail;
+}
+
 cocktail_t **get_order_cocktails(PGconn *conn, int *length, id_db_t id_order) {
     char query[QUERY_LENGTH];
     sprintf(query, "SELECT c.* FROM cocktails AS c, cocktails_orders AS c_o WHERE c.id = c_o.id_cocktail AND c_o.id_order = %lld", *id_order);

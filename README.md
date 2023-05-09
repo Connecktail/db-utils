@@ -228,6 +228,12 @@ int is_associated(PGconn *conn, module_t *module)
 cocktail_t **get_cocktails(PGconn *conn, int *length)
 ```
 
+- Get a cocktail by id :
+
+```c
+cocktail_t *get_cocktail_by_id(PGconn *conn, id_db_t id)
+```
+
 - Get the list of cocktails of a specifig order:
 
 ```c

@@ -109,6 +109,20 @@ void insert_order(PGconn *conn, order_t *order) {
     }
 }
 
+void delete_order(PGconn *conn, id_db_t id)
+{
+    if (id == NULL)
+    {
+        fprintf(stderr, "Invalid id\n");
+        return;
+    }
+    char query[QUERY_LENGTH];
+    sprintf(query, "DELETE FROM cocktails_orders WHERE id_order = %lld", *id);
+    _delete_data(conn, query);
+    
+    sprintf(query, "DELETE FROM orders WHERE id = %lld", *id);
+    _delete_data(conn, query);
+}
 
 void *update_order(PGconn *conn, order_t *order, float *new_price, int *new_status)
 {
