@@ -65,4 +65,13 @@ void delete_bottle(PGconn *conn, id_db_t id);
  */
 void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *new_url, float *new_quantity, module_t *new_module, float *new_price);
 
+/**
+ * @brief Get all the bottles that are not associated to a module
+ * @param conn A pointer to a PGconn object
+ * @param length A pointer to an int that will contain the length of the array
+ * @return An array of pointers on bottle_t objects
+ * @note A bottle is not associated to a module if its id_module field is NULL
+ */
+bottle_t** get_non_associated_bottles(PGconn *conn, int *length);
+
 #endif
