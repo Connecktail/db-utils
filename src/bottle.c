@@ -196,3 +196,10 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *
 
     return bottle;
 }
+
+bottle_t** get_non_associated_bottles(PGconn *conn, int *length)
+{
+    PGresult *result = PQexec(conn, "SELECT id as id_b,name as name_b,quantity as quantity_b, url as url_b, price as price_b FROM bottles WHERE id_module IS NULL");
+    *length = PQntuples(result);
+    return (bottle_t **)_loop_through_data(result, &create_bottle);
+}
