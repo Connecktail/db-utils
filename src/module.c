@@ -104,3 +104,15 @@ int is_associated(PGconn *conn, module_t *module)
     PGresult *res = PQexec(conn, query);
     return convert_bool(PQgetvalue(res, 0, 0)[0]);
 }
+
+void dissociate_module(PGconn *conn, module_t *module)
+{
+    if (is_associated(conn, module) == 0)
+    {
+        fprintf(stderr, "Module is not associated\n");
+        return;
+    }
+    char query[QUERY_LENGTH];
+    sprintf(query, "UPDATE bottles SET id_module=Null WHERE id_module='%s'", module->mac_address);
+    _update_data(conn, query);
+}

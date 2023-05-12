@@ -63,4 +63,13 @@ void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
  */
 int is_associated(PGconn *conn, module_t *module);
 
+/**
+ * @brief Dissociate a module from a bottle
+ * @param conn A pointer to a PGconn object
+ * @param module A pointer to a module_t object 
+ * @note This function checks first if the module is associated
+ * @note It sets the id_module of the bottle found to Null
+ */
+void dissociate_module(PGconn *conn, module_t *module);
+
 #endif
