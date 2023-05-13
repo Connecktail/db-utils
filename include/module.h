@@ -1,5 +1,6 @@
 #ifndef MODULE_H
 #define MODULE_H
+
 #include <postgresql/libpq-fe.h>
 #include "types.h"
 
