@@ -74,4 +74,14 @@ void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *
  */
 bottle_t** get_non_associated_bottles(PGconn *conn, int *length);
 
+/**
+ * @brief Associate a bottle to a module
+ * @param conn A pointer to a PGconn object
+ * @param bottle A pointer to a bottle_t object
+ * @param module A pointer to a module_t object
+ * @note This function checks first if the module is not associated
+*/
+void associate_bottle(PGconn *conn, bottle_t *bottle, module_t *module);
+
+
 #endif

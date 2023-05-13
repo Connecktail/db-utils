@@ -203,3 +203,16 @@ bottle_t** get_non_associated_bottles(PGconn *conn, int *length)
     *length = PQntuples(result);
     return (bottle_t **)_loop_through_data(result, &create_bottle);
 }
+
+void associate_bottle(PGconn *conn, bottle_t *bottle, module_t *module)
+{
+    if(!is_associated(conn, module)){
+        char query[QUERY_LENGTH];
+        sprintf(query, "UPDATE bottles SET id_module='%s' WHERE id='%lld'", module->mac_address, *(bottle->id));
+        void *check = _update_data(conn, query);
+        if(check == NULL){
+            fprintf(stderr, "Error while associating bottle\n");
+            return;
+        }else bottle->module = module;
+    }else fprintf(stderr, "Module is already associated\n");
+}
