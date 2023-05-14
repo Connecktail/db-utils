@@ -83,5 +83,11 @@ bottle_t** get_non_associated_bottles(PGconn *conn, int *length);
 */
 void associate_bottle(PGconn *conn, bottle_t *bottle, module_t *module);
 
-
+/**
+ * @brief Get a bottle from the database
+ * @param conn A pointer to a PGconn object
+ * @param id The id of the bottle to get
+ * @return A pointer to a bottle_t object
+ */
+bottle_t *get_bottle(PGconn *conn, id_db_t id);
 #endif
