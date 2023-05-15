@@ -37,6 +37,19 @@ bottle_t **get_bottles(PGconn *conn, int *length)
     return bottles;
 }
 
+bottle_t *get_bottle(PGconn *conn, id_db_t id)
+{
+    char query[QUERY_LENGTH];
+    sprintf(query, "SELECT b.id AS id_b, b.name AS name_b, b.quantity AS quantity_b, b.url AS url_b, b.price AS price_b, m.mac_address, m.ip_address FROM bottles AS b LEFT OUTER JOIN modules AS m ON b.id_module = m.mac_address WHERE b.id = '%lld' ORDER BY id", *id);
+    PGresult *result = PQexec(conn, query);
+    bottle_t **bottle = (bottle_t **)_loop_through_data(result, &create_bottle);
+    int length = PQntuples(result);
+    if (length == 0)
+        return NULL;
+    PQclear(result);
+    return bottle[0];
+}
+
 void _print_bottle(bottle_t *bottle)
 {
     long long int id = bottle->id == NULL ? -1 : *(bottle->id);
