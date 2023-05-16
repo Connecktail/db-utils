@@ -46,6 +46,7 @@ typedef struct
 {
     mac_address_t mac_address;
     ip_address_t ip_address;
+    int battery_level;
 } module_t;
 
 ```
@@ -212,12 +213,17 @@ void delete_module(PGconn *conn, mac_address_t mac_address)
 - Update a module in the database :
 
 ```c
-void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
+void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address, int *new_battery_level)
 ```
 
 - Know if a module is associated to a bottle : 
 ```c
 int is_associated(PGconn *conn, module_t *module)
+```
+
+- Dissociate a module from a bottle : 
+```c
+void dissociate_module(PGconn *conn, module_t *module)
 ```
 
 ### Cocktails

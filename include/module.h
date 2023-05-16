@@ -8,6 +8,7 @@ typedef struct
 {
     mac_address_t mac_address;
     ip_address_t ip_address;
+    int battery_level;
 } module_t;
 
 /**
@@ -54,7 +55,7 @@ void delete_module(PGconn *conn, mac_address_t mac_address);
  * @param new_ip_address The new ip address of the module
  * @return A pointer to NULL if the update failed
  */
-void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address);
+void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address, int *new_battery_level);
 
 /**
  * @brief Know if a module is associated to a bottle
