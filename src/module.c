@@ -12,6 +12,8 @@ module_t *create_module(PGresult *result, int row, int nbFields)
             strcpy(module->mac_address, PQgetvalue(result, row, i));
         if (strcmp(PQfname(result, i), "ip_address") == 0)
             strcpy(module->ip_address, PQgetvalue(result, row, i));
+        if (strcmp(PQfname(result, i), "battery_level") == 0)
+            module->battery_level = atoi(PQgetvalue(result, row, i));
     }
     return module;
 }
@@ -35,6 +37,7 @@ void _print_module(module_t *module)
 
     printf("Module[%s] {", mac_address);
     printf("ip_address: %s", module->ip_address);
+    printf(", battery_level: %d", module->battery_level);
     printf("}\n");
 }
 
@@ -47,7 +50,8 @@ void insert_module(PGconn *conn, module_t *module)
         return;
     }
     char query[QUERY_LENGTH];
-    sprintf(query, "INSERT INTO modules (mac_address, ip_address) VALUES ('%s','%s') RETURNING mac_address", module->mac_address, module->ip_address);
+    // By default, the battery_level field is set to 100
+    sprintf(query, "INSERT INTO modules (mac_address, ip_address, battery_level) VALUES ('%s','%s', 100) RETURNING mac_address", module->mac_address, module->ip_address);
 
     mac_address_t mac_address;
     strcpy(mac_address, _insert_data(conn, query));
@@ -68,7 +72,7 @@ void delete_module(PGconn *conn, mac_address_t mac_address)
     _delete_data(conn, query);
 }
 
-void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
+void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address, int *new_battery_level)
 {
     if (module->mac_address == NULL)
     {
@@ -84,7 +88,10 @@ void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
             return NULL;
         }
         char query[QUERY_LENGTH];
-        sprintf(query, "UPDATE modules SET ip_address = '%s' WHERE mac_address = '%s'", new_ip_address, module->mac_address);
+        if (new_battery_level != NULL)
+            sprintf(query, "UPDATE modules SET ip_address = '%s', battery_level = %d WHERE mac_address = '%s'", new_ip_address, *new_battery_level, module->mac_address);
+        else
+            sprintf(query, "UPDATE modules SET ip_address = '%s' WHERE mac_address = '%s'", new_ip_address, module->mac_address);
         check = _update_data(conn, query);
         if (check != NULL)
             strcpy(module->ip_address, new_ip_address);

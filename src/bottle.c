@@ -28,7 +28,7 @@ bottle_t **get_bottles(PGconn *conn, int *length)
 {
     PGresult *result = PQexec(
         conn, 
-        "SELECT b.id AS id_b, b.name AS name_b, b.quantity AS quantity_b, b.url AS url_b, b.price AS price_b, m.mac_address, m.ip_address FROM bottles AS b LEFT OUTER JOIN modules AS m ON b.id_module = m.mac_address ORDER BY id");
+        "SELECT b.id AS id_b, b.name AS name_b, b.quantity AS quantity_b, b.url AS url_b, b.price AS price_b, m.mac_address, m.ip_address, m.battery_level FROM bottles AS b LEFT OUTER JOIN modules AS m ON b.id_module = m.mac_address ORDER BY id");
     bottle_t **bottles = (bottle_t **)_loop_through_data(result, &create_bottle);
     *length = PQntuples(result);
     if (bottles == NULL)
@@ -40,7 +40,7 @@ bottle_t **get_bottles(PGconn *conn, int *length)
 bottle_t *get_bottle(PGconn *conn, id_db_t id)
 {
     char query[QUERY_LENGTH];
-    sprintf(query, "SELECT b.id AS id_b, b.name AS name_b, b.quantity AS quantity_b, b.url AS url_b, b.price AS price_b, m.mac_address, m.ip_address FROM bottles AS b LEFT OUTER JOIN modules AS m ON b.id_module = m.mac_address WHERE b.id = '%lld' ORDER BY id", *id);
+    sprintf(query, "SELECT b.id AS id_b, b.name AS name_b, b.quantity AS quantity_b, b.url AS url_b, b.price AS price_b, m.mac_address, m.ip_address, m.battery_level FROM bottles AS b LEFT OUTER JOIN modules AS m ON b.id_module = m.mac_address WHERE b.id = '%lld' ORDER BY id", *id);
     PGresult *result = PQexec(conn, query);
     bottle_t **bottle = (bottle_t **)_loop_through_data(result, &create_bottle);
     int length = PQntuples(result);
