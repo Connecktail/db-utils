@@ -184,6 +184,24 @@ void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
 void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *new_url, float *new_quantity, module_t *new_module, float *new_price)
 ```
 
+- Get the bottles that are not associated with modules :
+
+```c
+bottle_t** get_non_associated_bottles(PGconn *conn, int *length)
+```
+
+- Associate a bottle with a module :
+
+```c
+void associate_bottle(PGconn *conn, bottle_t *bottle, module_t *module)
+```
+
+- Get a bottle depending on its id :
+
+```c
+bottle_t *get_bottle(PGconn *conn, id_db_t id)
+```
+
 ### Modules
 
 - Get the list of modules :
