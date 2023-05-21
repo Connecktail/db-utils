@@ -175,13 +175,31 @@ void insert_bottle(PGconn *conn, bottle_t *bottle)
 - Delete a bottle from the database :
 
 ```c
-void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
+void delete_bottle(PGconn *conn, id_db_t id)
 ```
 
 - Update a bottle in the database :
 
 ```c
 void *update_bottle(PGconn *conn, bottle_t *bottle, char *new_name[255], url_t *new_url, float *new_quantity, module_t *new_module, float *new_price)
+```
+
+- Get the bottles that are not associated with modules :
+
+```c
+bottle_t** get_non_associated_bottles(PGconn *conn, int *length)
+```
+
+- Associate a bottle with a module :
+
+```c
+void associate_bottle(PGconn *conn, bottle_t *bottle, module_t *module)
+```
+
+- Get a bottle depending on its id :
+
+```c
+bottle_t *get_bottle(PGconn *conn, id_db_t id)
 ```
 
 ### Modules
@@ -240,7 +258,7 @@ cocktail_t **get_cocktails(PGconn *conn, int *length)
 cocktail_t *get_cocktail_by_id(PGconn *conn, id_db_t id)
 ```
 
-- Get the list of cocktails of a specifig order:
+- Get the list of cocktails of an order:
 
 ```c
 cocktail_t **get_order_cocktails(PGconn *conn, int *length, id_db_t id_order)
