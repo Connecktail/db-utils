@@ -175,7 +175,7 @@ void insert_bottle(PGconn *conn, bottle_t *bottle)
 - Delete a bottle from the database :
 
 ```c
-void *update_module(PGconn *conn, module_t *module, ip_address_t new_ip_address)
+void delete_bottle(PGconn *conn, id_db_t id)
 ```
 
 - Update a bottle in the database :
@@ -258,7 +258,7 @@ cocktail_t **get_cocktails(PGconn *conn, int *length)
 cocktail_t *get_cocktail_by_id(PGconn *conn, id_db_t id)
 ```
 
-- Get the list of cocktails of a specifig order:
+- Get the list of cocktails of an order:
 
 ```c
 cocktail_t **get_order_cocktails(PGconn *conn, int *length, id_db_t id_order)
